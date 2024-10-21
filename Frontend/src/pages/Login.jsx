@@ -16,16 +16,18 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log("hii")
       await axios
-        .post(
-          "https://hospital-management-backend-2w2h.onrender.com/api/v1/user/login",
-          { email, password, confirmPassword, role: "Patient" },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((res) => {
+      .post(
+        "https://hospital-management-backend-2w2h.onrender.com/api/v1/user/login",
+        { email, password, confirmPassword, role: "Patient" },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      .then((res) => {
+         
           toast.success(res.data.message);
           setIsAuthenticated(true);
           navigateTo("/");
@@ -34,6 +36,7 @@ const Login = () => {
           setConfirmPassword("");
         });
     } catch (error) {
+      console.log(error)
       toast.error(error.response.data.message);
     }
   };
