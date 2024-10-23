@@ -10,7 +10,7 @@ const Messages = () => {
     const fetchMessages = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/message/getall",
+          "https://dashboard.render.com/web/srv-csb7b823esus73bfq4f0/api/v1/message/getall",
           
           { withCredentials: true }
         );
