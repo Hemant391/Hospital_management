@@ -10,7 +10,7 @@ const Messages = () => {
     const fetchMessages = async () => {
       try {
         const { data } = await axios.get(
-          "https://dashboard.render.com/web/srv-csb7b823esus73bfq4f0/api/v1/message/getall",
+          "https://hospital-management-backend-2w2h.onrender.com/api/v1/message/getall",
           
           { withCredentials: true }
         );
