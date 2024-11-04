@@ -34,7 +34,7 @@ const Doctors = () => {
             return (
               <div key={ind} className="card">
                 <img
-                  src={element.docAvatar && element.docAvatar.url}
+                  src={(element.docAvatar && element.docAvatar.url)||'/docHolder.jpg'}
                   alt="doctor avatar"
                 />
                 <h4>{`${element.firstName} ${element.lastName}`}</h4>

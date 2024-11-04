@@ -110,9 +110,6 @@ export const logoutPatient = catchAsyncErrors (async(req,res,next)=>{
 
 
 export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
-  // Ensure `express-fileupload` or similar middleware is used in your app
-  
-  // Check if the avatar file is present
   const { docAvatar } = req.files || {};
   if (!docAvatar) {
     return next(new ErrorHandler("Doctor Avatar Required!", 400));
