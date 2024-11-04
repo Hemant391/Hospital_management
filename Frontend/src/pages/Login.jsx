@@ -16,7 +16,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log("hii")
+      
       await axios
       .post(
         "https://hospital-management-backend-2w2h.onrender.com/api/v1/user/login",
@@ -36,7 +36,6 @@ const Login = () => {
           setConfirmPassword("");
         });
     } catch (error) {
-      console.log(error)
       toast.error(error.response.data.message);
     }
   };

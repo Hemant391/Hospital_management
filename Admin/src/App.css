@@ -25,6 +25,13 @@ body {
   border-top-left-radius: 50px;
   border-bottom-left-radius: 50px;
 }
+
+.page button{
+  cursor: pointer;
+}
+.page button:hover{
+  color: #a4a1b1;
+}
 @media (max-width: 1208px) {
   .page {
     margin-left: 0;
