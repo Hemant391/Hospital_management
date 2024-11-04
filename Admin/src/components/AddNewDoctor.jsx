@@ -6,20 +6,21 @@ import axios from "axios";
 
 const AddNewDoctor = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
-
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [nic, setNic] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [password, setPassword] = useState("");
-  const [doctorDepartment, setDoctorDepartment] = useState("");
-  const [docAvatar, setDocAvatar] = useState("");
-  const [docAvatarPreview, setDocAvatarPreview] = useState("");
-
   const navigateTo = useNavigate();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    nic: "",
+    dob: "",
+    gender: "",
+    password: "",
+    doctorDepartment: "",
+    docAvatar: null,
+    docAvatarPreview: "",
+  });
 
   const departmentsArray = [
     "Pediatrics",
@@ -33,114 +34,89 @@ const AddNewDoctor = () => {
     "ENT",
   ];
 
-  const handleAvatar = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
+    reader.onload = () => setFormData((prevData) => ({
+      ...prevData,
+      docAvatar: file,
+      docAvatarPreview: reader.result,
+    }));
     reader.readAsDataURL(file);
-    reader.onload = () => {
-      setDocAvatarPreview(reader.result);
-      setDocAvatar(file);
-    };
+  };
+
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      nic: "",
+      dob: "",
+      gender: "",
+      password: "",
+      doctorDepartment: "",
+      docAvatar: null,
+      docAvatarPreview: "",
+    });
   };
 
   const handleAddNewDoctor = async (e) => {
     e.preventDefault();
+    const submissionData = new FormData();
+    for (let key in formData) {
+      submissionData.append(key, formData[key]);
+    }
     try {
-      const formData = new FormData();
-      formData.append("firstName", firstName);
-      formData.append("lastName", lastName);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("password", password);
-      formData.append("nic", nic);
-      formData.append("dob", dob);
-      formData.append("gender", gender);
-      formData.append("doctorDepartment", doctorDepartment);
-      formData.append("docAvatar", docAvatar);
-      console.log(formData)
-      await axios
-        .post("https://hospital-management-backend-2w2h.onrender.com/api/v1/user/doctor/addnew", formData, {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((res) => {
-          toast.success(res.data.message);
-          setIsAuthenticated(true);
-          navigateTo("/");
-          setFirstName("");
-          setLastName("");
-          setEmail("");
-          setPhone("");
-          setNic("");
-          setDob("");
-          setGender("");
-          setPassword("");
-        });
+      const response = await axios.post(
+        "https://hospital-management-backend-2w2h.onrender.com/api/v1/user/doctor/addnew",
+        submissionData,
+        { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } }
+      );
+      toast.success(response.data.message);
+      setIsAuthenticated(true);
+      navigateTo("/");
+      resetForm();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to add doctor");
     }
   };
 
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
   }
+
   return (
     <section className="page">
       <section className="container add-doctor-form">
-        <img src="/logo.png" alt="logo" className="logo"/>
+        <img src="/logo.png" alt="logo" className="logo" />
         <h1 className="form-title">REGISTER A NEW DOCTOR</h1>
         <form onSubmit={handleAddNewDoctor}>
           <div className="first-wrapper">
             <div>
               <img
-                src={
-                  docAvatarPreview ? `${docAvatarPreview}` : "/docHolder.jpg"
-                }
+                src={formData.docAvatarPreview || "/docHolder.jpg"}
                 alt="Doctor Avatar"
               />
-              <input type="file" onChange={handleAvatar} />
+              <input type="file" onChange={handleAvatarChange} />
             </div>
             <div>
-              <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Mobile Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="NIC"
-                value={nic}
-                onChange={(e) => setNic(e.target.value)}
-              />
-              <input
-                type={"date"}
-                placeholder="Date of Birth"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-              />
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
+              {["firstName", "lastName", "email", "phone", "nic", "dob"].map((field) => (
+                <input
+                  key={field}
+                  type={field === "dob" ? "date" : "text"}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleInputChange}
+                />
+              ))}
+              <select name="gender" value={formData.gender} onChange={handleInputChange}>
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -148,23 +124,21 @@ const AddNewDoctor = () => {
               <input
                 type="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
               />
               <select
-                value={doctorDepartment}
-                onChange={(e) => {
-                  setDoctorDepartment(e.target.value);
-                }}
+                name="doctorDepartment"
+                value={formData.doctorDepartment}
+                onChange={handleInputChange}
               >
                 <option value="">Select Department</option>
-                {departmentsArray.map((depart, index) => {
-                  return (
-                    <option value={depart} key={index}>
-                      {depart}
-                    </option>
-                  );
-                })}
+                {departmentsArray.map((department, index) => (
+                  <option key={index} value={department}>
+                    {department}
+                  </option>
+                ))}
               </select>
               <button type="submit">Register New Doctor</button>
             </div>
