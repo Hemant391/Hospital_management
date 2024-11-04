@@ -108,80 +108,87 @@ export const logoutPatient = catchAsyncErrors (async(req,res,next)=>{
     })
 })
 
-export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
-    // if (!req.files || Object.keys(req.files).length === 0) {
-    //   return next(new ErrorHandler("Doctor Avatar Required!", 400));
-    // }
-    const { docAvatar } = req.files;
-    if(docAvatar){
 
-      const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
-      if (!allowedFormats.includes(docAvatar.mimetype)) {
-        return next(new ErrorHandler("File Format Not Supported!", 400));
-      }
-    }
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      nic,
-      dob,
-      gender,
-      password,
-      doctorDepartment,
-    } = req.body;
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !phone ||
-      !nic ||
-      !dob ||
-      !gender ||
-      !password ||
-      !doctorDepartment 
-      // || !docAvatar
-    ) {
-      return next(new ErrorHandler("Please Fill Full Form!", 400));
-    }
-    const isRegistered = await User.findOne({ email });
-    if (isRegistered) {
-      return next(
-        new ErrorHandler("Doctor With This Email Already Exists!", 400)
-      );
-    }
-    const cloudinaryResponse = await cloudinary.uploader.upload(
-      docAvatar.tempFilePath
-    );
-    if (!cloudinaryResponse || cloudinaryResponse.error) {
-      console.error(
-        "Cloudinary Error:",
-        cloudinaryResponse.error || "Unknown Cloudinary error"
-      );
-      return next(
-        new ErrorHandler("Failed To Upload Doctor Avatar To Cloudinary", 500)
-      );
-    }
-    const doctor = await User.create({
-      firstName,
-      lastName,
-      email,
-      phone,
-      nic,
-      dob,
-      gender,
-      password,
-      role: "Doctor",
-      doctorDepartment,
-      docAvatar: {
-        public_id: cloudinaryResponse.public_id,
-        url: cloudinaryResponse.secure_url,
-      },
-    });
-    res.status(200).json({
-      success: true,
-      message: "New Doctor Registered",
-      doctor,
-    });
+export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
+  // Ensure `express-fileupload` or similar middleware is used in your app
+  
+  // Check if the avatar file is present
+  const { docAvatar } = req.files || {};
+  if (!docAvatar) {
+    return next(new ErrorHandler("Doctor Avatar Required!", 400));
+  }
+
+  // Validate file format
+  const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
+  if (!allowedFormats.includes(docAvatar.mimetype)) {
+    return next(new ErrorHandler("File Format Not Supported!", 400));
+  }
+
+  // Destructure form data from request body
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    nic,
+    dob,
+    gender,
+    password,
+    doctorDepartment,
+  } = req.body;
+
+  // Check for required fields
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !phone ||
+    !nic ||
+    !dob ||
+    !gender ||
+    !password ||
+    !doctorDepartment
+  ) {
+    return next(new ErrorHandler("Please Fill Full Form!", 400));
+  }
+
+  // Check if doctor already exists by email
+  const isRegistered = await User.findOne({ email });
+  if (isRegistered) {
+    return next(new ErrorHandler("Doctor With This Email Already Exists!", 400));
+  }
+
+  // Upload the avatar image to Cloudinary
+  let cloudinaryResponse;
+  try {
+    cloudinaryResponse = await cloudinary.uploader.upload(docAvatar.tempFilePath);
+  } catch (error) {
+    console.error("Cloudinary Error:", error);
+    return next(new ErrorHandler("Failed To Upload Doctor Avatar To Cloudinary", 500));
+  }
+
+  // Create the doctor in the database
+  const doctor = await User.create({
+    firstName,
+    lastName,
+    email,
+    phone,
+    nic,
+    dob,
+    gender,
+    password,
+    role: "Doctor",
+    doctorDepartment,
+    docAvatar: {
+      public_id: cloudinaryResponse.public_id,
+      url: cloudinaryResponse.secure_url,
+    },
   });
+
+  // Send response
+  res.status(200).json({
+    success: true,
+    message: "New Doctor Registered",
+    doctor,
+  });
+});
