@@ -111,15 +111,15 @@ export const logoutPatient = catchAsyncErrors (async(req,res,next)=>{
 
 export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
   const { docAvatar } = req.files || {};
-  if (!docAvatar) {
-    return next(new ErrorHandler("Doctor Avatar Required!", 400));
-  }
+  // if (!docAvatar) {
+  //   return next(new ErrorHandler("Doctor Avatar Required!", 400));
+  // }
 
-  // Validate file format
-  const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
-  if (!allowedFormats.includes(docAvatar.mimetype)) {
-    return next(new ErrorHandler("File Format Not Supported!", 400));
-  }
+  // // Validate file format
+  // const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
+  // if (!allowedFormats.includes(docAvatar.mimetype)) {
+  //   return next(new ErrorHandler("File Format Not Supported!", 400));
+  // }
 
   // Destructure form data from request body
   const {
@@ -156,13 +156,13 @@ export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Upload the avatar image to Cloudinary
-  let cloudinaryResponse;
-  try {
-    cloudinaryResponse = await cloudinary.uploader.upload(docAvatar.tempFilePath);
-  } catch (error) {
-    console.error("Cloudinary Error:", error);
-    return next(new ErrorHandler("Failed To Upload Doctor Avatar To Cloudinary", 500));
-  }
+  // let cloudinaryResponse;
+  // try {
+  //   cloudinaryResponse = await cloudinary.uploader.upload(docAvatar.tempFilePath);
+  // } catch (error) {
+  //   console.error("Cloudinary Error:", error);
+  //   return next(new ErrorHandler("Failed To Upload Doctor Avatar To Cloudinary", 500));
+  // }
 
   // Create the doctor in the database
   const doctor = await User.create({
@@ -176,10 +176,10 @@ export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
     password,
     role: "Doctor",
     doctorDepartment,
-    docAvatar: {
-      public_id: cloudinaryResponse.public_id,
-      url: cloudinaryResponse.secure_url,
-    },
+    // docAvatar: {
+    //   public_id: cloudinaryResponse.public_id,
+    //   url: cloudinaryResponse.secure_url,
+    // },
   });
 
   // Send response
