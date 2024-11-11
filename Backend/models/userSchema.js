@@ -72,7 +72,6 @@ userSchema.pre('save',async function (next) {
 
 userSchema.methods.comparePassword = async function (enterPass) {
     return await bycrypt.compare(enterPass,this.password);
-    
 }
 
 userSchema.methods.generateJsonWebToken=function(){

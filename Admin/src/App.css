@@ -108,6 +108,9 @@ body {
   border-radius: 7px;
   border: 1px solid gray;
 }
+.form-component button:hover{
+  color: rgb(153, 150, 150);
+}
 .form-component button {
   padding: 10px 35px;
   color: #fff;
@@ -118,6 +121,7 @@ body {
   font-size: 24px;
   margin-bottom: 30px;
   background: linear-gradient(140deg, #9083d5, #271776ca);
+  cursor: pointer;
 }
 .form-component .wrapper {
   display: flex;
